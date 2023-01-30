@@ -11,7 +11,6 @@ RUN cd /etc/yum.repos.d/
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 RUN yum install -y epel-release
-#RUN yum makecache
 RUN yum install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison automake libtool libuv-devel git
 RUN rpmdev-setuptree
 RUN echo '%dist   .el8' >> /.rpmmacros
