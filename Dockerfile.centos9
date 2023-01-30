@@ -1,21 +1,32 @@
-FROM centos:9
-ENV HOME /
+FROM almalinux:9
+ENV HOME /root
 RUN { \
         echo '[Devel]'; \
-        echo 'name=CentOS-$releasever - Devel'; \
-        echo 'mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=Devel&infra=$infra'; \
-        echo '#baseurl=http://mirror.centos.org/$contentdir/$releasever/Devel/$basearch/os/'; \
-        echo 'gpgcheck=1'; \
+        echo 'name=Almalinux-$releasever - Devel'; \
+        echo 'baseurl=https://repo.almalinux.org/development/almalinux/$releasever/devel/x86_64/'; \
+        echo 'gpgcheck=0'; \
         echo 'enabled=1'; \
-        echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial'; \
-    } > /etc/yum.repos.d/CentOS-Devel.repo
-RUN yum update -y
-RUN yum install -y epel-release
-RUN yum install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison automake libtool libuv-devel git
+    } > /etc/yum.repos.d/Almalinux-Devel.repo
+RUN dnf install epel-release -y
+RUN dnf makecache
+RUN dnf install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison automake libtool libuv-devel git zlib-devel bzip2-devel libffi-devel gcc which perl
+#RUN dnf install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison libuv-devel git zlib-develi
+RUN dnf install -y compat-openssl11
+RUN echo "$PATH"
+RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv
+RUN git clone https://github.com/rbenv/ruby-build.git /root/.rbenv/plugins/ruby-build
+RUN echo 'eval "$(rbenv init -)"' >> /root/.bashrc
+RUN source /root/.bashrc
+ENV PATH="/root/.rbenv/plugins/ruby-build/bin:/root/.rbenv/bin:/root/.rbenv/shims:$PATH"
+RUN echo "$PATH"
+RUN rbenv install 2.7.7
+RUN curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor | bash
+RUN rbenv global 2.7.7 
+ENV HOME /
 RUN rpmdev-setuptree
 RUN echo '%dist   .el9' >> /.rpmmacros
 ADD ./rpmbuild/ /rpmbuild/
 RUN chown -R root:root /rpmbuild
-RUN rpmbuild -ba /rpmbuild/SPECS/h2o.spec
+RUN rpmbuild -ba /rpmbuild/SPECS/h2o.spec -v
 RUN tar -czf /tmp/h2o.tar.gz -C /rpmbuild RPMS SRPMS
 CMD ["/bin/true"]
