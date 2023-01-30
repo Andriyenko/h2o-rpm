@@ -9,16 +9,12 @@ RUN { \
     } > /etc/yum.repos.d/Almalinux-Devel.repo
 RUN dnf install epel-release -y
 RUN dnf makecache
-RUN dnf install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison automake libtool libuv-devel git zlib-devel bzip2-devel libffi-devel gcc which perl
-#RUN dnf install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison libuv-devel git zlib-develi
-RUN dnf install -y compat-openssl11
-RUN echo "$PATH"
-RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv
-RUN git clone https://github.com/rbenv/ruby-build.git /root/.rbenv/plugins/ruby-build
-RUN echo 'eval "$(rbenv init -)"' >> /root/.bashrc
-RUN source /root/.bashrc
-ENV PATH="/root/.rbenv/plugins/ruby-build/bin:/root/.rbenv/bin:/root/.rbenv/shims:$PATH"
-RUN echo "$PATH"
+RUN dnf install -y rpm-build redhat-rpm-config rpmdevtools cmake gcc-c++ tar make openssl-devel ruby ruby-devel bison libuv-devel git zlib-devel which perl compat-openssl11
+RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
+RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
+RUN echo 'eval "$(rbenv init -)"' >> $HOME/.bashrc
+RUN source $HOME/.bashrc
+ENV PATH="$HOME/.rbenv/plugins/ruby-build/bin:$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
 RUN rbenv install 2.7.7
 RUN curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor | bash
 RUN rbenv global 2.7.7 
